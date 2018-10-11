@@ -17,8 +17,11 @@
       @mousedown="onMouseDown(element.id)"
   >
     <div class="tr-content-image"
+         :class="{
+          'tr-content-image_inside-canvas': element.inCanvas,
+         }"
          :style="getElementStyles(element)">
-      {{element.isSelected}}
+      insideCanvas: {{element.inCanvas}}
     </div>
 
   </FreeTransform>
@@ -128,6 +131,10 @@
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
+  }
+
+  .tr-content-image_inside-canvas {
+    outline: 3px lime solid;
   }
 
 </style>

@@ -17,13 +17,17 @@
         <button @click="addOne">add one</button>
         <ResultCanvas />
         <button @click="drawImage">drawImage</button>
+        <burron ref="shareButton"></burron>
       </div>
-      <pre>
+      <pre style="position: fixed; top: 0; right: 0;">
         {{boxSizes}}
       </pre>
-      <pre>
+      <pre style="position: fixed; top: 40px; right: 0;">
         {{elements}}
       </pre>
+
+      <div class="intersection div1" ref="div1"></div>
+      <div class="intersection div2" ref="div2"></div>
     </div>
   </div>
 </template>
@@ -31,8 +35,9 @@
 <script>
   import FreeTransformBox from './components/FreeTransformBox/index.vue';
   import ResultCanvas from './components/ResultCanvas/index.vue';
+  import isIntersected from './utils/isIntersected.js';
 
-  let currentId = 1;
+  let currentId = 0;
   const moustache = require('./assets/mustache-clipart-9.png');
 
   export default {
@@ -54,6 +59,20 @@
       this.canvas = this.$refs.workspace.getBoundingClientRect();
       this.offsetX = this.$refs.workspace.offsetLeft;
       this.offsetY = this.$refs.workspace.offsetTop;
+
+      const {div1, div2} = this.$refs;
+      isIntersected(div1, div2);
+
+      // share
+      this.$refs.shareButton.innerHTML = window.VK.Share.button({
+        url: 'https://ru.4game.com/',
+        title: 'Crow',
+        image: 'https://ru.4game.com/c/cCrowfall/mainpage-tile/cover.jpg',
+        noparse: true
+      }, {
+        type: 'custom',
+        text: `<button class="vk-share">vk-share</button>`,
+      });
     },
 
     computed: {
@@ -69,12 +88,12 @@
 
     methods: {
       update(id, payload) {
-        console.info(payload);
         this.elements = this.elements.map(item => {
           if (item.id === id) {
             return {
               ...item,
-              ...payload
+              ...payload,
+              inCanvas: isIntersected(this.canvas, item, {x: this.offsetX, y: this.offsetY}),
             }
           }
           return item
@@ -96,20 +115,18 @@
         const id = currentId;
         currentId++;
         const colors = [
-          'red',
-          'green',
-          'blue'
+          'rgba(255, 0, 0, .3)',
+          'rgba(255, 255, 0, .3)',
+          'rgba(0, 0, 255, .3)'
         ];
         return {
           id: `el-${id}`,
-          x: 100 + (10 * id),
-          y: 50 + (10 * id),
+          x: 0 + (10 * id),
+          y: 0 + (10 * id),
           scaleX: 1,
           scaleY: 1,
-          width: 60,
-          actualWidth: 60,
-          height: 60,
-          actualHeight: 60,
+          width: 400,
+          height: 400,
           angle: 0,
           classPrefix: "tr",
           styles: {
@@ -118,6 +135,7 @@
           },
 
           isSelected: false,
+          inCanvas: true,
         }
       },
       selectElement(id) {
@@ -138,6 +156,26 @@
 </script>
 
 <style>
+  .intersection {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    border: 1px solid black;
+  }
+  .div1 {
+    background: rgba(200, 0, 0, .5);
+  }
+  .div2 {
+    top: -10px;
+    background: rgba(0, 200, 0, .5);
+  }
+
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+  }
+
   #app {
     display: flex;
     background: #F8FAFC;
@@ -145,6 +183,7 @@
 
   .wrapper {
     flex: 1;
+    margin-left: 89px;
   }
 
   .workspace {
