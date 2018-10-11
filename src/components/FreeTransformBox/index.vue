@@ -20,7 +20,11 @@
          :class="{
           'tr-content-image_inside-canvas': element.inCanvas,
          }"
-         :style="getElementStyles(element)">
+         :style="{
+            width: '100%',
+            height: '100%',
+            backgroundImage: `url(${element.assetImage})`,
+         }">
       insideCanvas: {{element.inCanvas}}
     </div>
 
@@ -36,7 +40,6 @@
       'offsetY',
       'canvas',
       'element',
-      'getElementStyles',
       'update',
       'selectElement'
     ],
@@ -44,7 +47,7 @@
       FreeTransform
     },
     methods: {
-      onMouseDown: function(id) {
+      onMouseDown: function (id) {
         this.selectElement(id);
       },
     }

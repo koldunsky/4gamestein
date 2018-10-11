@@ -11,13 +11,13 @@
         >
           <FreeTransformBox
               v-for="element in elements"
+              :key="element.id"
               :element="element"
               :offset-x="offsetX"
               :offset-y="offsetY"
               :canvas="canvas"
               :update="update"
               :selectElement="selectElement"
-              :getElementStyles="getElementStyles"
           />
         </div>
         <button @click="addOne">add one</button>
@@ -107,14 +107,6 @@
           return item
         })
       },
-      getElementStyles(element) {
-        const styles = element.styles ? element.styles : {}
-        return {
-          width: '100%',
-          height: '100%',
-          ...styles
-        }
-      },
       addOne() {
         this.elements.push(this.getNewBox())
 
@@ -137,8 +129,8 @@
           height: 100,
           angle: 0,
           classPrefix: "tr",
+          assetImage: moustache,
           styles: {
-            backgroundImage: `url(${moustache})`,
             backgroundColor: `${colors[id % 3]}`,
           },
 
