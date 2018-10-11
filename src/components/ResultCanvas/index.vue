@@ -1,13 +1,22 @@
 <template>
   <div class="result-canvas">
-    <canvas ref="canvas" width="200" height="100"></canvas>
+    <canvas
+        class="canvas"
+        ref="canvas"
+        :width="width"
+        :height="height"
+    >
+
+    </canvas>
   </div>
 </template>
 
 <script>
   export default {
-    props: {
-    },
+    props: [
+      'width',
+      'height'
+    ],
 
     mounted() {
       const ctx = this.$refs.canvas.getContext("2d");

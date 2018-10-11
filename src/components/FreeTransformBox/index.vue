@@ -95,6 +95,7 @@
   .tr-transform__scale-point--ml {
     top: calc(50% - 7px);
     left: -7px;
+    display: none;
   }
 
   .tr-transform__scale-point--tr {
@@ -105,20 +106,23 @@
   .tr-transform__scale-point--tm {
     left: calc(50% - 7px);
     top: -7px;
+    display: none;
   }
 
   .tr-transform__scale-point--mr {
     left: calc(100% - 7px);
     top: calc(50% - 7px);
-  }
-
-  .tr-transform__scale-point--bl {
-    left: -7px;
-    top: calc(100% - 7px);
+    display: none;
   }
 
   .tr-transform__scale-point--bm {
     left: calc(50% - 7px);
+    top: calc(100% - 7px);
+    display: none;
+  }
+
+  .tr-transform__scale-point--bl {
+    left: -7px;
     top: calc(100% - 7px);
   }
 

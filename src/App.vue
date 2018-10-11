@@ -2,7 +2,13 @@
   <div id="app">
     <div class="App">
       <div class="wrapper">
-        <div class="workspace" ref="workspace">
+        <div ref="workspace"
+             class="workspace"
+             :style="{
+               width: `${canvasWidth}px`,
+               height: `${canvasHeight}px`
+             }"
+        >
           <FreeTransformBox
               v-for="element in elements"
               :element="element"
@@ -15,7 +21,10 @@
           />
         </div>
         <button @click="addOne">add one</button>
-        <ResultCanvas />
+        <ResultCanvas
+            :width="canvasWidth"
+            :height="canvasHeight"
+        />
         <button @click="drawImage">drawImage</button>
         <burron ref="shareButton"></burron>
       </div>
@@ -25,9 +34,6 @@
       <pre style="position: fixed; top: 40px; right: 0;">
         {{elements}}
       </pre>
-
-      <div class="intersection div1" ref="div1"></div>
-      <div class="intersection div2" ref="div2"></div>
     </div>
   </div>
 </template>
@@ -50,6 +56,8 @@
         offsetX: 0,
         offsetY: 0,
         canvas: null,
+        canvasWidth: 300,
+        canvasHeight: 400,
         elements: [
           this.getNewBox()
         ]
@@ -59,9 +67,6 @@
       this.canvas = this.$refs.workspace.getBoundingClientRect();
       this.offsetX = this.$refs.workspace.offsetLeft;
       this.offsetY = this.$refs.workspace.offsetTop;
-
-      const {div1, div2} = this.$refs;
-      isIntersected(div1, div2);
 
       // share
       this.$refs.shareButton.innerHTML = window.VK.Share.button({
@@ -73,10 +78,13 @@
         type: 'custom',
         text: `<button class="vk-share">vk-share</button>`,
       });
+      window.VK.Observer.subscribe("widgets.like.shared", function f() {
+        alert('Молодец!');
+      });
     },
 
     computed: {
-      boxSizes: function() {
+      boxSizes: function () {
         return this.elements.map((el) => {
           return {
             h: el.height * el.scaleY,
@@ -125,8 +133,8 @@
           y: 0 + (10 * id),
           scaleX: 1,
           scaleY: 1,
-          width: 400,
-          height: 400,
+          width: 100,
+          height: 100,
           angle: 0,
           classPrefix: "tr",
           styles: {
@@ -162,9 +170,11 @@
     position: relative;
     border: 1px solid black;
   }
+
   .div1 {
     background: rgba(200, 0, 0, .5);
   }
+
   .div2 {
     top: -10px;
     background: rgba(0, 200, 0, .5);
