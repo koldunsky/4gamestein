@@ -12,9 +12,10 @@
       :disable-scale="true"
       :aspect-ratio="false"
       :selected="element.isSelected"
-      selectOn="click"
+      selectOn="mousedown"
       @update="update(element.id, $event)"
       @mousedown="onMouseDown(element.id)"
+      @mouseup="$emit('mouseup', element.id)"
   >
     <div class="tr-content-image"
          :class="{

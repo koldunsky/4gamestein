@@ -18,15 +18,17 @@
               :canvas="canvas"
               :update="update"
               :selectElement="selectElement"
+              @mouseup="onMouseUp(element.id)"
           />
         </div>
         <button @click="addOne">add one</button>
         <ResultCanvas
             :width="canvasWidth"
             :height="canvasHeight"
+            :assets="elements"
         />
         <button @click="drawImage">drawImage</button>
-        <burron ref="shareButton"></burron>
+        <button ref="shareButton"></button>
       </div>
       <pre style="position: fixed; top: 0; right: 0;">
         {{boxSizes}}
@@ -42,6 +44,7 @@
   import FreeTransformBox from './components/FreeTransformBox/index.vue';
   import ResultCanvas from './components/ResultCanvas/index.vue';
   import isIntersected from './utils/isIntersected.js';
+  import _remove from 'lodash/remove';
 
   let currentId = 0;
   const moustache = require('./assets/mustache-clipart-9.png');
@@ -59,6 +62,7 @@
         canvasWidth: 300,
         canvasHeight: 400,
         elements: [
+          this.getNewBox(),
           this.getNewBox()
         ]
       }
@@ -78,9 +82,9 @@
         type: 'custom',
         text: `<button class="vk-share">vk-share</button>`,
       });
-      window.VK.Observer.subscribe("widgets.like.shared", function f() {
-        alert('Молодец!');
-      });
+      // window.VK.Observer.subscribe("widgets.like.shared", function f() {
+      //   alert('Молодец!');
+      // });
     },
 
     computed: {
@@ -121,13 +125,13 @@
         ];
         return {
           id: `el-${id}`,
-          x: 0 + (10 * id),
-          y: 0 + (10 * id),
+          x: 15 + (10 * id),
+          y: 15 + (10 * id),
           scaleX: 1,
           scaleY: 1,
           width: 100,
           height: 100,
-          angle: 0,
+          angle: 30,
           classPrefix: "tr",
           assetImage: moustache,
           styles: {
@@ -140,7 +144,6 @@
       },
       selectElement(id) {
         this.elements = this.elements.map(item => {
-          console.info(item.id, id);
           return {
             ...item,
             isSelected: item.id === id,
@@ -150,27 +153,17 @@
 
       drawImage() {
         console.info('draaaaaw!');
+      },
+      onMouseUp(id) {
+        const elementsCopy = [...this.elements];
+        _remove(elementsCopy, (el) => el.id === id && !el.inCanvas);
+        this.elements = elementsCopy;
       }
     }
   }
 </script>
 
 <style>
-  .intersection {
-    width: 100px;
-    height: 100px;
-    position: relative;
-    border: 1px solid black;
-  }
-
-  .div1 {
-    background: rgba(200, 0, 0, .5);
-  }
-
-  .div2 {
-    top: -10px;
-    background: rgba(0, 200, 0, .5);
-  }
 
   body,
   html {
