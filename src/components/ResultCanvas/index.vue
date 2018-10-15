@@ -40,11 +40,12 @@
     methods: {
       drawAsset(a) {
         const normalizedAsset = this.normalizeSize(a);
+
         const {width, height, x, y, angle, assetImage} = normalizedAsset;
 
-        const image = new Image(width, height);
+        console.info('drawAsset', x, y);
 
-        this.normalizeSize(a);
+        const image = new Image(width, height);
 
         image.onload = () => {
           if (angle !== 0) {
@@ -83,19 +84,50 @@
         const realX = Math.round(asset.x - (realW - asset.width));
         const realH = asset.scaleY * asset.height;
         const realY = Math.round(asset.y - (realH - asset.height));
-        console.info(realX);
-        console.info(realY);
 
-        return {
+        const imageFormat = realW > realH ? 'landscape' : 'portrait';
+        const shorterSide = Math.min(realH, realW);
+
+        const preFinish = {  // )))))
           ...asset,
           x: realX,
           y: realY,
           height: realH,
           width: realW,
         };
-      },
-      getSizeWithSquareAspectRatio(asset) {
 
+        if (realW > realH) {
+
+        }
+
+        const transformator = {
+          'landscape': (asset) => {
+            console.info(asset.x + (realW - shorterSide) / 2);
+            return {
+              ...asset,
+              x: asset.x + (realW - shorterSide) / 2,
+              width: shorterSide,
+              height: shorterSide,
+            }
+          },
+          'portrait': (asset) => ({
+            ...asset,
+            y: asset.y + (realH - shorterSide) / 2,
+            width: shorterSide,
+            height: shorterSide,
+          }),
+        };
+
+        return transformator[imageFormat]({
+          ...asset,
+          x: realX,
+          y: realY,
+          height: realH,
+          width: realW,
+        });
+      },
+
+      getSizeWithSquareAspectRatio(asset) {
         return asset;
       }
     }
