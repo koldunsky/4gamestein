@@ -1,7 +1,7 @@
 <template>
   <div class="leftPanel">
     <div
-        v-for="cat, key in categories"
+        v-for="(cat, key) in categories"
         :key="key"
         class="category"
         :class="{
