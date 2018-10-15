@@ -3,6 +3,8 @@ import App from './App.vue';
 import store from './store';
 import VueDragResizeAndRotate from 'vue-drag-resize-and-rotate'
 
+import './global/style/index.scss';
+
 Vue.config.productionTip = false;
 
 new Vue({

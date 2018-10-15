@@ -1,0 +1,9 @@
+$z-list:
+        'editor',
+        'editorPanel',
+        'eritorAsset'
+;
+
+@function z-index($key) {
+  @return index($z-list, $key);
+}

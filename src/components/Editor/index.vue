@@ -1,183 +1,214 @@
 <template>
-  <div id="editor">
-    <div class="App">
+  <div id="azaza">
+    <div class="editor">
+      <LeftPanel
+          class="editor__left-panel"
+          :categories="categories"
+          :selectCategory="selectCategory"
+      />
+      <RightPanel
+          class="editor__right-panel"
+          :assets="assets"
+          :selectAsset="selectAsset"
+      />
       <div class="wrapper">
-        <div class="workspace" ref="workspace">
-          <FreeTransform
-              :x="freeTransform.x"
-              :y="freeTransform.y"
-              :scale-x="freeTransform.scaleX"
-              :scale-y="freeTransform.scaleY"
-              :width="freeTransform.width"
-              :height="freeTransform.height"
-              :angle="freeTransform.angle"
-              :offset-x="freeTransform.offsetX"
-              :offset-y="freeTransform.offsetY"
-              :disable-scale="true"
-              @update="update(freeTransform, $event)"
-          >
-            <div class="element"
-                 :style="getElementStyles(freeTransform)">
-              {{freeTransform.text}}
-            </div>
-
-          </FreeTransform>
+        <div ref="workspace"
+             class="workspace"
+             :style="{
+               width: `${canvasWidth}px`,
+               height: `${canvasHeight}px`
+             }"
+        >
+          <FreeTransformBox
+              v-for="element in elements"
+              :key="element.id"
+              :element="element"
+              :offset-x="offsetX"
+              :offset-y="offsetY"
+              :canvas="canvas"
+              :update="update"
+              :selectElement="selectElement"
+              @mouseup="onMouseUp(element.id)"
+          />
         </div>
+        <ResultCanvas
+            :width="canvasWidth"
+            :height="canvasHeight"
+            :assets="elements"
+        />
+        <button ref="shareButton"></button>
       </div>
+      <pre style="position: fixed; top: 0; right: 0;">
+        {{boxSizes}}
+      </pre>
+      <pre style="position: fixed; top: 40px; right: 0;">
+        {{elements}}
+      </pre>
     </div>
   </div>
 </template>
 
 <script>
-  import FreeTransform from 'vue-free-transform'
+  import FreeTransformBox from '../FreeTransformBox/index.vue';
+  import ResultCanvas from '../ResultCanvas/index.vue';
+  import LeftPanel from './leftPanel.vue';
+  import RightPanel from './rightPanel.vue';
+  import data from './data';
+
+  import isIntersected from '../../utils/isIntersected.js';
+  // import _remove from 'lodash/remove';
+  import _each from 'lodash/each';
+  import _map from 'lodash/map';
+
+  let currentId = 0;
+  const moustache = require('../../assets/mustache-clipart-9.png');
 
   export default {
-    name: 'editor',
     components: {
-      FreeTransform
+      FreeTransformBox,
+      ResultCanvas,
+      LeftPanel,
+      RightPanel
     },
     data() {
+      const {categories} = data;
       return {
-        freeTransform: {
-          id: "el-1",
-          x: 100,
-          y: 50,
+        categories,
+        assets: [],
+        offsetX: 0,
+        offsetY: 0,
+        canvas: null,
+        canvasWidth: 300,
+        canvasHeight: 400,
+        elements: [
+          // this.getNewBox(),
+          // this.getNewBox()
+        ]
+      }
+    },
+    mounted() {
+      this.canvas = this.$refs.workspace.getBoundingClientRect();
+      this.offsetX = this.$refs.workspace.offsetLeft;
+      this.offsetY = this.$refs.workspace.offsetTop;
+
+      // share
+
+      // this.$refs.shareButton.innerHTML = window.VK.Share.button({
+      //   url: 'https://ru.4game.com/',
+      //   title: 'Crow',
+      //   image: 'https://ru.4game.com/c/cCrowfall/mainpage-tile/cover.jpg',
+      //   noparse: true
+      // }, {
+      //   type: 'custom',
+      //   text: `<button class="vk-share">vk-share</button>`,
+      // });
+    },
+
+    computed: {
+      boxSizes: function () {
+        return this.elements.map((el) => {
+          return {
+            h: el.height * el.scaleY,
+            w: el.width * el.scaleX,
+          }
+        });
+      }
+    },
+
+    methods: {
+      update(id, payload) {
+        this.elements = this.elements.map(item => {
+          if (item.id === id) {
+            return {
+              ...item,
+              ...payload,
+              inCanvas: isIntersected(this.canvas, item, {x: this.offsetX, y: this.offsetY}),
+            }
+          }
+          return item
+        })
+      },
+      getNewBox(image = moustache) {
+        const id = currentId;
+        currentId++;
+
+        const vacantCoords = this.findVacantPlace();
+
+        const colors = [
+          'rgba(255, 0, 0, .3)',
+          'rgba(255, 255, 0, .3)',
+          'rgba(0, 0, 255, .3)'
+        ];
+        return {
+          id: `el-${id}`,
+          x: vacantCoords,
+          y: vacantCoords,
           scaleX: 1,
           scaleY: 1,
           width: 100,
           height: 100,
           angle: 0,
           classPrefix: "tr",
+          assetImage: image,
           styles: {
-            background: "linear-gradient(135deg, #0FF0B3 0%,#036ED9 100%)",
+            backgroundColor: `${colors[id % 3]}`,
           },
-          offsetX: 0,
-          offsetY: 0
-        }
-      }
-    },
-    mounted() {
-      this.freeTransform.offsetX = this.$refs.workspace.offsetLeft;
-      this.freeTransform.offsetY = this.$refs.workspace.offsetTop;
-    },
-    methods: {
-      update(item, payload) {
-        Vue.nextTick();
-        console.info(payload);
-        this.freeTransform = {
-          ...item,
-          ...payload
+
+          isSelected: true,
+          inCanvas: true,
         }
       },
-      getElementStyles(element) {
-        const styles = element.styles ? element.styles : {}
-        return {
-          width: `${element.width}px`,
-          height: `${element.height}px`,
-          ...styles
+      selectElement(id) {
+        this.elements = this.elements.map(item => {
+          return {
+            ...item,
+            isSelected: item.id === id,
+          }
+        });
+      },
+
+      onMouseUp(id) {
+        // const elementsCopy = [...this.elements];
+        // _remove(elementsCopy, (el) => el.id === id && !el.inCanvas);
+        // console.warn('ты хочешь его удалить?', id)
+        // this.elements = elementsCopy;
+      },
+
+      findVacantPlace(step = 15) {
+        if(!this.elements) {
+          return 0;
         }
+        let counter = 0;
+        const sorted = this.elements.sort((el1, el2) => el1.x < el2.x ? -1 : 1);
+        console.info(sorted);
+        sorted.forEach((el) => {
+          if (el.x === counter * step) {
+            counter++;
+          }
+        });
+
+        return counter * step;
+      },
+
+      selectCategory(key) {
+        _each(this.categories, (cat, catKey) => {
+          if (key === catKey) {
+            cat.isActive = true;
+            this.assets = cat.assets;
+          } else {
+            cat.isActive = false;
+          }
+        });
+      },
+      selectAsset(asset) {
+        this.elements = _map(this.elements, (el) => ({
+          ...el,
+          isSelected: false,
+        }));
+        this.elements.push(this.getNewBox(asset.image))
       }
-    },
+    }
   }
 </script>
 
-<style>
-  #editor {
-    display: flex;
-    background: #F8FAFC;
-  }
-
-  .wrapper {
-    flex: 1;
-  }
-
-  .workspace {
-    width: 800px;
-    height: 800px;
-    margin: 25px auto;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    background: #fff;
-
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  .tr-transform__content {
-    user-select: none;
-  }
-
-  .tr-transform__rotator {
-    top: -45px;
-    left: calc(50% - 7px);
-  }
-
-  .tr-transform__rotator,
-  .tr-transform__scale-point {
-    background: #fff;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    position: absolute;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-  }
-
-  .tr-transform__rotator:hover,
-  .tr-transform__scale-point:hover {
-    background: #F1F5F8;
-  }
-
-  .tr-transform__rotator:active,
-  .tr-transform__scale-point:active {
-    background: #DAE1E7;
-  }
-
-  .tr-transform__scale-point {
-
-  }
-
-  .tr-transform__scale-point--tl {
-    top: -7px;
-    left: -7px;
-  }
-
-  .tr-transform__scale-point--ml {
-    top: calc(50% - 7px);
-    left: -7px;
-  }
-
-  .tr-transform__scale-point--tr {
-    left: calc(100% - 7px);
-    top: -7px;
-  }
-
-  .tr-transform__scale-point--tm {
-    left: calc(50% - 7px);
-    top: -7px;
-  }
-
-  .tr-transform__scale-point--mr {
-    left: calc(100% - 7px);
-    top: calc(50% - 7px);
-  }
-
-  .tr-transform__scale-point--bl {
-    left: -7px;
-    top: calc(100% - 7px);
-  }
-
-  .tr-transform__scale-point--bm {
-    left: calc(50% - 7px);
-    top: calc(100% - 7px);
-  }
-
-  .tr-transform__scale-point--br {
-    left: calc(100% - 7px);
-    top: calc(100% - 7px);
-  }
-
-</style>
+<style lang="scss" src="./index.scss" scoped></style>
