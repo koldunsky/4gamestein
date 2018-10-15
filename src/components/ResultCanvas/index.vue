@@ -33,24 +33,27 @@
 
     mounted() {
       this.ctx = this.$refs.canvas.getContext("2d");
-      this.ctx.rect(20,20,150,300);
+      this.ctx.rect(20, 20, 150, 300);
       this.ctx.stroke();
       this.assets.forEach(this.drawAsset);
     },
     methods: {
       drawAsset(a) {
-        const width = a.width * a.scaleX;
-        const height = a.height * a.scaleY;
+        const normalizedAsset = this.normalizeSize(a);
+        const {width, height, x, y, angle, assetImage} = normalizedAsset;
+
         const image = new Image(width, height);
 
+        this.normalizeSize(a);
+
         image.onload = () => {
-          if (a.angle !== 0) {
-            this.drawRotated(image, a.x, a.y, width, height, a.angle)
+          if (angle !== 0) {
+            this.drawRotated(image, x, y, width, height, angle)
           } else {
-            this.ctx.drawImage(image, a.x, a.y, width, height);
+            this.ctx.drawImage(image, x, y, width, height);
           }
         };
-        image.src = a.assetImage;
+        image.src = assetImage;
       },
 
       drawRotated(image, x, y, w, h, degrees) {
@@ -62,7 +65,7 @@
         ctx.save();
 
         // Move to the center of the image
-        ctx.translate(x + w/2, y + h/2);
+        ctx.translate(x + w / 2, y + h / 2);
 
         // Rotate canvas
         ctx.rotate(degrees * (Math.PI / 180));
@@ -73,6 +76,27 @@
 
         // we’re done with the rotating so restore the unrotated context
         ctx.restore();
+      },
+
+      normalizeSize(asset) {
+        const realW = asset.scaleX * asset.width;
+        const realX = Math.round(asset.x - (realW - asset.width));
+        const realH = asset.scaleY * asset.height;
+        const realY = Math.round(asset.y - (realH - asset.height));
+        console.info(realX);
+        console.info(realY);
+
+        return {
+          ...asset,
+          x: realX,
+          y: realY,
+          height: realH,
+          width: realW,
+        };
+      },
+      getSizeWithSquareAspectRatio(asset) {
+
+        return asset;
       }
     }
   };

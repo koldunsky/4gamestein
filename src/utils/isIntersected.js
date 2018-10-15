@@ -28,13 +28,13 @@ export default function( parent, child, parentOffset = 0) {
 
   const  not_colliding = ( parent_distance_from_top < childY || parent.y > child_distance_from_top || parent_distance_from_left < childX || parent.x > child_distance_from_left );
 
-  console.info('parent', parent_distance_from_left);
-  console.info('child', childX);
-
-  console.info('parent_distance_from_top < childY', parent_distance_from_top < childY);
-  console.info('parent.y > child_distance_from_top', parent.y > child_distance_from_top);
-  console.info('parent_distance_from_left < childX', parent_distance_from_left < childX);
-  console.info('parent.x > child_distance_from_left', parent.x > child_distance_from_left);
+  // console.info('parent', parent_distance_from_left);
+  // console.info('child', childX);
+  //
+  // console.info('parent_distance_from_top < childY', parent_distance_from_top < childY);
+  // console.info('parent.y > child_distance_from_top', parent.y > child_distance_from_top);
+  // console.info('parent_distance_from_left < childX', parent_distance_from_left < childX);
+  // console.info('parent.x > child_distance_from_left', parent.x > child_distance_from_left);
   // Return whether it IS colliding
   return ! not_colliding;
 };
