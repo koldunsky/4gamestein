@@ -2,7 +2,7 @@ export default {
   categories: {
     hats: {
       title: 'Шляпы',
-      icon: require('../../assets/cap.svg'),
+      icon: require('-!file-loader!../../assets/cap.svg'),
       isActive: false,
       assets: [
         {
@@ -65,7 +65,7 @@ export default {
     },
     fats: {
       title: 'Мусташи',
-      icon: require('../../assets/cap.svg'),
+      icon: require('-!file-loader!../../assets/cap.svg'),
       isActive: false,
       assets: [
         {
@@ -128,7 +128,7 @@ export default {
     },
     rats: {
       title: 'Шляпы',
-      icon: require('../../assets/cap.svg'),
+      icon: require('-!file-loader!../../assets/cap.svg'),
       isActive: false,
       assets: [
         {
@@ -191,7 +191,7 @@ export default {
     },
     mats: {
       title: 'Шляпы',
-      icon: require('../../assets/cap.svg'),
+      icon: require('-!file-loader!../../assets/cap.svg'),
       isActive: false,
       assets: [
         {

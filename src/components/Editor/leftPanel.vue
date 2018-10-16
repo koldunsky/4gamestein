@@ -1,5 +1,9 @@
 <template>
-  <div class="leftPanel">
+  <div class="leftPanel"
+       :class="{
+        'inactive': !readyToChooseMask
+       }"
+  >
     <div
         v-for="(cat, key) in categories"
         :key="key"
@@ -25,6 +29,10 @@
   export default {
     components: {},
     props: {
+      readyToChooseMask: {
+        type: Boolean,
+        required: true,
+      },
       categories: {
         type: Object,
         required: true,
@@ -38,6 +46,16 @@
 </script>
 
 <style scoped lang="scss">
+  .leftPanel {
+    background-color: #0c1011;
+    border-radius: 5px;
+  }
+
+  .inactive {
+    opacity: .8;
+    pointer-events: none;
+  }
+
   .category {
     width: 70px;
     margin-bottom: 15px;
@@ -51,5 +69,14 @@
   .categoryIcon {
     width: 70px;
     height: 70px;
+  }
+
+  .categoryTitle {
+    color: transparent;
+    color: white;
+  }
+
+  .category:hover .categoryTitle {
+    color: white;
   }
 </style>

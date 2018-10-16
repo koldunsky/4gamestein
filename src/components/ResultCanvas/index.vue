@@ -1,5 +1,6 @@
 <template>
-  <div class="result-canvas">
+  <div class="resultCanvas">
+    <h1>PRVIEW</h1>
     <canvas
         class="canvas"
         ref="canvas"
@@ -29,24 +30,17 @@
     },
 
     updated() {
-      this.ctx.clearRect(0, 0, parseInt(this.width, 10), parseInt(this.height, 10));
-      this.assets.forEach(this.drawAsset);
+      this.redraw();
     },
 
     mounted() {
       this.ctx = this.$refs.canvas.getContext("2d");
-      this.ctx.rect(20, 20, 150, 300);
-      this.ctx.stroke();
-      this.assets.forEach(this.drawAsset);
+      this.redraw();
     },
     methods: {
       drawAsset(a) {
         const normalizedAsset = this.normalizeSize(a);
-
         const {width, height, x, y, angle, assetImage} = normalizedAsset;
-
-        console.info('drawAsset', x, y);
-
         const image = new Image(width, height);
 
         image.onload = () => {
@@ -90,15 +84,6 @@
         const imageFormat = realW > realH ? 'landscape' : 'portrait';
         const shorterSide = Math.min(realH, realW);
 
-
-
-
-        if (realW > realH) {
-
-        } else {
-
-        }
-
         const transformator = {
           'landscape': (asset) => {
             return {
@@ -124,6 +109,32 @@
           width: realW,
         });
       },
+
+      redraw() {
+        const {
+          ctx,
+          width,
+          height,
+          background,
+          assets
+        } = this;
+
+        // Clear
+        ctx.clearRect(0, 0, parseInt(width, 10), parseInt(height, 10));
+
+        // Photo
+        if (background) {
+          const image = new Image(width, height);
+
+          image.onload = () => {
+            this.ctx.drawImage(image, 0, 0, width, height);
+          };
+          image.src = background;
+        }
+
+        // Assets
+        assets.forEach(this.drawAsset);
+      }
     }
   };
 </script>

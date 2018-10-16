@@ -1,6 +1,7 @@
 <template>
   <div
       :class="{
+        'rightPanel': true,
         'inactive': assets.length === 0
       }"
   >
@@ -41,8 +42,14 @@
 </script>
 
 <style scoped lang="scss">
+  .rightPanel {
+    background-color: #0c1011;
+    border-radius: 5px;
+  }
+
   .inactive {
-    background: pink;
+    opacity: .8;
+    pointer-events: none;
   }
 
   .scrollContainer {

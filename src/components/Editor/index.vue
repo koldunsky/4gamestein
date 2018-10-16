@@ -9,6 +9,7 @@
           class="editor__left-panel"
           :categories="categories"
           :selectCategory="selectCategory"
+          :readyToChooseMask="photoSrc !== null"
       />
       <RightPanel
           class="editor__right-panel"
@@ -23,6 +24,7 @@
                height: `${canvasHeight}px`
              }"
         >
+          <SvgPlaceholder class="svgBg" />
           <div
               class="photoBg"
               :style="{backgroundImage: `url(${photoSrc})`}"
@@ -48,7 +50,6 @@
             :assets="elements"
             :background="photoSrc"
         />
-        <button ref="shareButton"></button>
       </div>
       <pre style="position: fixed; top: 0; right: 0;">
         {{boxSizes}}
@@ -75,6 +76,8 @@
 
   import {width, height} from '../../constants/editor';
 
+  import SvgPlaceholder from './assets/editorPlaceholder.svg';
+
   let currentId = 0;
   const moustache = require('../../assets/mustache-clipart-9.png');
 
@@ -84,7 +87,8 @@
       ResultCanvas,
       LeftPanel,
       RightPanel,
-      PhotoTaker
+      PhotoTaker,
+      SvgPlaceholder
     },
     data() {
       const {categories} = data;
@@ -97,28 +101,13 @@
         photoSrc: null,
         canvasWidth: width,
         canvasHeight: height,
-        elements: [
-          // this.getNewBox(),
-          // this.getNewBox()
-        ]
+        elements: []
       }
     },
     mounted() {
       this.canvas = this.$refs.workspace.getBoundingClientRect();
       this.offsetX = this.$refs.workspace.offsetLeft;
       this.offsetY = this.$refs.workspace.offsetTop;
-
-      // share
-
-      this.$refs.shareButton.innerHTML = window.VK.Share.button({
-        url: 'https://ru.4game.com/',
-        title: 'Crow',
-        image: 'https://ru.4game.com/c/cCrowfall/mainpage-tile/cover.jpg',
-        noparse: true
-      }, {
-        type: 'custom',
-        text: `<button class="vk-share">vk-share</button>`,
-      });
     },
 
     computed: {
