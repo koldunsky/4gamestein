@@ -39,8 +39,8 @@
 
 <style scoped lang="scss">
   .category {
-    width: 40px;
-    margin-bottom: 20px;
+    width: 70px;
+    margin-bottom: 15px;
     cursor: pointer;
   }
 
@@ -49,7 +49,7 @@
   }
 
   .categoryIcon {
-    width: 40px;
-    height: 40px;
+    width: 70px;
+    height: 70px;
   }
 </style>

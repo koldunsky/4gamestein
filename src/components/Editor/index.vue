@@ -1,6 +1,10 @@
 <template>
   <div id="azaza">
     <div class="editor">
+      <PhotoTaker
+          class="editor__photo-taker"
+          @saveToCanvas="addPhotoToCanvas"
+      />
       <LeftPanel
           class="editor__left-panel"
           :categories="categories"
@@ -19,6 +23,12 @@
                height: `${canvasHeight}px`
              }"
         >
+          <div
+              class="photoBg"
+              :style="{backgroundImage: `url(${photoSrc})`}"
+          >
+
+          </div>
           <FreeTransformBox
               v-for="element in elements"
               :key="element.id"
@@ -32,9 +42,11 @@
           />
         </div>
         <ResultCanvas
+            class="resultCanvas"
             :width="canvasWidth"
             :height="canvasHeight"
             :assets="elements"
+            :background="photoSrc"
         />
         <button ref="shareButton"></button>
       </div>
@@ -53,12 +65,15 @@
   import ResultCanvas from '../ResultCanvas/index.vue';
   import LeftPanel from './leftPanel.vue';
   import RightPanel from './rightPanel.vue';
+  import PhotoTaker from '../PhotoTaker/index.vue';
   import data from './data';
 
   import isIntersected from '../../utils/isIntersected.js';
   // import _remove from 'lodash/remove';
   import _each from 'lodash/each';
   import _map from 'lodash/map';
+
+  import {width, height} from '../../constants/editor';
 
   let currentId = 0;
   const moustache = require('../../assets/mustache-clipart-9.png');
@@ -68,7 +83,8 @@
       FreeTransformBox,
       ResultCanvas,
       LeftPanel,
-      RightPanel
+      RightPanel,
+      PhotoTaker
     },
     data() {
       const {categories} = data;
@@ -78,8 +94,9 @@
         offsetX: 0,
         offsetY: 0,
         canvas: null,
-        canvasWidth: 300,
-        canvasHeight: 400,
+        photoSrc: null,
+        canvasWidth: width,
+        canvasHeight: height,
         elements: [
           // this.getNewBox(),
           // this.getNewBox()
@@ -93,15 +110,15 @@
 
       // share
 
-      // this.$refs.shareButton.innerHTML = window.VK.Share.button({
-      //   url: 'https://ru.4game.com/',
-      //   title: 'Crow',
-      //   image: 'https://ru.4game.com/c/cCrowfall/mainpage-tile/cover.jpg',
-      //   noparse: true
-      // }, {
-      //   type: 'custom',
-      //   text: `<button class="vk-share">vk-share</button>`,
-      // });
+      this.$refs.shareButton.innerHTML = window.VK.Share.button({
+        url: 'https://ru.4game.com/',
+        title: 'Crow',
+        image: 'https://ru.4game.com/c/cCrowfall/mainpage-tile/cover.jpg',
+        noparse: true
+      }, {
+        type: 'custom',
+        text: `<button class="vk-share">vk-share</button>`,
+      });
     },
 
     computed: {
@@ -206,6 +223,10 @@
           isSelected: false,
         }));
         this.elements.push(this.getNewBox(asset.image))
+      },
+
+      addPhotoToCanvas(base64) {
+        this.photoSrc = base64;
       }
     }
   }

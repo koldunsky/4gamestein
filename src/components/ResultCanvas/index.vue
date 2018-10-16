@@ -7,8 +7,9 @@
         :height="height"
     >
     </canvas>
-    <div style="opacity: 0"></div>
-    {{assets}}
+    <div style="opacity: 0; height: 0; width: 0;">
+      {{assets}}
+    </div>
   </div>
 </template>
 
@@ -18,6 +19,7 @@
       'width',
       'height',
       'assets',
+      'background',
     ],
 
     data() {
@@ -88,21 +90,17 @@
         const imageFormat = realW > realH ? 'landscape' : 'portrait';
         const shorterSide = Math.min(realH, realW);
 
-        const preFinish = {  // )))))
-          ...asset,
-          x: realX,
-          y: realY,
-          height: realH,
-          width: realW,
-        };
+
+
 
         if (realW > realH) {
+
+        } else {
 
         }
 
         const transformator = {
           'landscape': (asset) => {
-            console.info(asset.x + (realW - shorterSide) / 2);
             return {
               ...asset,
               x: asset.x + (realW - shorterSide) / 2,
@@ -126,10 +124,6 @@
           width: realW,
         });
       },
-
-      getSizeWithSquareAspectRatio(asset) {
-        return asset;
-      }
     }
   };
 </script>

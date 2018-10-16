@@ -1,0 +1,50 @@
+@import '../../global/style/utils';
+
+.photoTaker {
+  width: 460px;
+  height: 590px;
+  outline: 3px darkorange solid;
+}
+
+.buttonsBlock {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  z-index: z-index('photoTakerButtons');
+}
+
+.inputFileLabel {
+  position: relative;
+  background: cyan;
+  padding: 5px;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.inputFile {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  left: -99999px;
+}
+
+.photoTaker__webcamBlock {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: z-index('photoTakerWebcam')
+}
+
+.photoTaker__croppieBlock {
+  @include stretch;
+  z-index: z-index('photoTakerCroppie')
+}
+
+.chooseWebcamBtn {
+  position: relative;
+  cursor: pointer;
+  z-index: 2;
+}

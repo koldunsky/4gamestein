@@ -1,9 +1,24 @@
-$z-list:
-        'editor',
-        'editorPanel',
-        'eritorAsset'
-;
+$editor-w: 460px;
+$editor-h: 590px;
+
+$z-list: 'editor',
+'photoTaker',
+'photoTakerButtons',
+'photoTakerWebcam',
+'photoTakerWebcamScreenshotButton',
+'photoTakerCroppie',
+'editorPanel',
+'eritorAsset';
 
 @function z-index($key) {
   @return index($z-list, $key);
+}
+
+@mixin stretch($pos: absolute) {
+  position: $pos;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
