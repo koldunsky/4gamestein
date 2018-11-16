@@ -2,6 +2,7 @@
 
 * {
   box-sizing: border-box;
+  font-family: Gotham, Helvetica, sans-serif;
 }
 
 body,
@@ -9,8 +10,37 @@ html {
   margin: 0;
   padding: 0;
   background: $generalBg;
+  color: $fontColorBlue;
+  color: $fontColorBlue;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.3;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  min-width: 1100px;
+}
+
+body.frozen {
+  overflow: hidden;
 }
 
 img {
   max-width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+.fakeHeader {
+  display: none;
 }

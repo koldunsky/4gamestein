@@ -1,0 +1,25 @@
+@import '../../../global/style/utils';
+@import '../../../global/style/btnUtils';
+
+.webcamRoot {
+  overflow: hidden;
+  height: 590px;
+  width: 460px;
+}
+
+.video {
+  height: 100%;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.screenshotButton {
+  @include button(center);
+  z-index: 2;
+}
+
+.resetButton__icon {
+  @include resetBtn();
+}

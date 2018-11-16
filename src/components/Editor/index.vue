@@ -1,20 +1,48 @@
 <template>
-  <div id="azaza">
+  <div class="editorStage">
+    <div
+        class="mnstr"
+        :style="{transform: `translateY(${scrollAmount / -5}px)`}"
+    ></div>
+    <div class="editorDescription">
+      <div class="editorDescription__icon">
+        <PumpkinIcon
+            class="pumpkinIcon"
+        />
+      </div>
+      <div class="editorDescription__title">
+        Лаборатория Фогеймштейна
+      </div>
+      <div class="editorDescription__text">
+        Подготовься к самому страшному празднику:<br>
+        приклей рога и натяни кровожадную улыбку!<br>
+        Просто загрузи свою фотографию и укрась её частями монстров
+        <br>из любимых игр.
+
+      </div>
+      <!--<EditorExamples-->
+      <!--class="editor__examples"-->
+      <!--/>-->
+    </div>
     <div class="editor">
       <PhotoTaker
+          v-if="!photoSrc"
           class="editor__photo-taker"
           @saveToCanvas="addPhotoToCanvas"
+          @onReset="resetEditor"
+          @onTypeChoose="photoTakerChooseType"
       />
       <LeftPanel
           class="editor__left-panel"
           :categories="categories"
           :selectCategory="selectCategory"
-          :readyToChooseMask="photoSrc !== null"
+          :readyToChooseMask="photoSrc !== null && !editFinished"
       />
       <RightPanel
           class="editor__right-panel"
           :assets="assets"
           :selectAsset="selectAsset"
+          :readyToChooseMask="photoSrc !== null && !editFinished"
       />
       <div class="wrapper">
         <div ref="workspace"
@@ -24,7 +52,9 @@
                height: `${canvasHeight}px`
              }"
         >
-          <SvgPlaceholder class="svgBg" />
+          <SvgPlaceholder
+              v-if="!photoSrc && !photoTakerTypeHasBeenTaken"
+              class="svgBg"/>
           <div
               class="photoBg"
               :style="{backgroundImage: `url(${photoSrc})`}"
@@ -40,23 +70,50 @@
               :canvas="canvas"
               :update="update"
               :selectElement="selectElement"
-              @mouseup="onMouseUp(element.id)"
+              @mouseup="onMouseUp"
+          />
+          <ResetButton
+              v-if="photoSrc"
+              @click="resetEditor"
+              :transparent="true"
+              text="Удалить всё"
           />
         </div>
+        <div
+            class="trashBin"
+            :class="{
+                'trashBin_shown ': trashBinVisible,
+                'trashBin_active ': trashBinActive,
+              }"
+            ref="trashBin"
+        >
+          <TrashBinIcon class="trashBin__icon"/>
+        </div>
         <ResultCanvas
+            v-if="editFinished"
             class="resultCanvas"
             :width="canvasWidth"
             :height="canvasHeight"
             :assets="elements"
-            :background="photoSrc"
+            :photo="photoSrc"
+            @onImagesReady="onImagesReady"
         />
       </div>
-      <pre style="position: fixed; top: 0; right: 0;">
-        {{boxSizes}}
-      </pre>
-      <pre style="position: fixed; top: 40px; right: 0;">
-        {{elements}}
-      </pre>
+      <div
+          v-if="photoSrc && elements.length"
+          class="finishButtonBlock"
+      >
+        <Button
+            class="finishButtonBlock__button"
+            @click="onFinishEdit"
+        >
+          Сохранить и поделиться
+        </Button>
+      </div>
+      <div class="ctaText">
+        Поделись и сразу получи промокод с бонусом +13% <br>
+        при пополнении счета в Фогейме!
+      </div>
     </div>
   </div>
 </template>
@@ -64,136 +121,241 @@
 <script>
   import FreeTransformBox from '../FreeTransformBox/index.vue';
   import ResultCanvas from '../ResultCanvas/index.vue';
-  import LeftPanel from './leftPanel.vue';
-  import RightPanel from './rightPanel.vue';
+  import LeftPanel from '../LeftPanel/index';
+  import RightPanel from '../RightPanel/index.vue';
   import PhotoTaker from '../PhotoTaker/index.vue';
-  import data from './data';
+  import Button from '../Button/index.vue';
+  import EditorExamples from '../EditorExamples/index.vue';
+  import ResetButton from '../ResetButton/index.vue';
 
-  import isIntersected from '../../utils/isIntersected.js';
-  // import _remove from 'lodash/remove';
+  import PumpkinIcon from './assets/pumpkinIcon.svg';
+  import SvgPlaceholder from './assets/editorPlaceholder.svg';
+  import TrashBinIcon from './assets/trash.svg';
+
+  import testWebp from '../../utils/webpSupport';
+  import getClosest from '../../utils/getClosest';
+  import getScroll from '../../utils/getScroll';
+
+  import rawCategories from './data';
+
+  import isIntersected, {isIntersectedForNonSmokers} from '../../utils/isIntersected.js';
+  import getAssets from '../../utils/requireMedia';
+  import _remove from 'lodash/remove';
+  import _debounce from 'lodash/debounce';
   import _each from 'lodash/each';
   import _map from 'lodash/map';
+  import _some from 'lodash/some';
+  import _filter from 'lodash/filter';
 
-  import {width, height} from '../../constants/editor';
-
-  import SvgPlaceholder from './assets/editorPlaceholder.svg';
+  import {WIDTH, HEIGHT} from '../../constants/editor';
 
   let currentId = 0;
-  const moustache = require('../../assets/mustache-clipart-9.png');
+  let order = 1;
 
   export default {
+    props: {
+      scrollAmount: {
+        type: Number,
+        required: true,
+      }
+    },
+
     components: {
       FreeTransformBox,
       ResultCanvas,
       LeftPanel,
       RightPanel,
       PhotoTaker,
-      SvgPlaceholder
+      SvgPlaceholder,
+      PumpkinIcon,
+      TrashBinIcon,
+      Button,
+      EditorExamples,
+      ResetButton,
     },
     data() {
-      const {categories} = data;
       return {
-        categories,
+        categories: {},
         assets: [],
         offsetX: 0,
         offsetY: 0,
         canvas: null,
         photoSrc: null,
-        canvasWidth: width,
-        canvasHeight: height,
-        elements: []
+        photoTakerTypeHasBeenTaken: false,
+        canvasWidth: WIDTH,
+        canvasHeight: HEIGHT,
+        elements: [],
+        mouse: {
+          x: null,
+          y: null,
+        },
+        editFinished: false,
       }
     },
     mounted() {
       this.canvas = this.$refs.workspace.getBoundingClientRect();
-      this.offsetX = this.$refs.workspace.offsetLeft;
-      this.offsetY = this.$refs.workspace.offsetTop;
+      this.updateOffset();
+
+      window.addEventListener('resize', _debounce(this.updateOffset, 500, {trailing: false}));
+
+      testWebp((canWebp) => {
+        if (canWebp) {
+          this.categories = this.fillCategories(rawCategories, getAssets()['webp']);
+        } else {
+          this.categories = this.fillCategories(rawCategories, getAssets()['png']);
+        }
+
+        this.assets = _filter(this.categories, {isActive: true})[0].assets;
+      });
+      document.addEventListener('mousemove', (e) => {
+        this.mouse = {
+          x: e.pageX,
+          y: e.pageY,
+        }
+      });
+
+      document.addEventListener('mousedown', (e) => {
+        if (!getClosest(e.target, '.tr-transform') && !getClosest(e.target, '.asset')) {
+          this.selectElement(null);
+        }
+      })
     },
 
     computed: {
-      boxSizes: function () {
-        return this.elements.map((el) => {
-          return {
-            h: el.height * el.scaleY,
-            w: el.width * el.scaleX,
-          }
-        });
+      trashBinVisible() {
+        return _some(this.elements, {underDrag: true})
+      },
+      trashBinActive() {
+        return _some(this.elements, {willBeRemoved: true})
       }
     },
 
     methods: {
+      photoTakerChooseType() {
+        this.photoTakerTypeHasBeenTaken = true;
+      },
+
+      resetEditor() {
+        if(confirm("Точно удалить всё и начать сначала?")) {
+          this.photoTakerTypeHasBeenTaken = false;
+          this.photoSrc = null;
+          this.elements = [];
+        }
+      },
+
+      updateOffset() {
+        const wsp = this.$refs.workspace;
+        this.offsetX = wsp.getBoundingClientRect().left + getScroll.left();
+        this.offsetY = wsp.getBoundingClientRect().top + getScroll.top();
+      },
+
       update(id, payload) {
+        const wspRect = this.$refs.workspace.getBoundingClientRect();
+
         this.elements = this.elements.map(item => {
           if (item.id === id) {
             return {
               ...item,
               ...payload,
-              inCanvas: isIntersected(this.canvas, item, {x: this.offsetX, y: this.offsetY}),
+              inCanvas: isIntersected({
+                x: this.offsetX,
+                y: this.offsetY,
+                height: wspRect.height,
+                width: wspRect.width,
+              }, item),
+              willBeRemoved: this.checkTrashIntersection(),
             }
           }
           return item
         })
       },
-      getNewBox(image = moustache) {
+
+      getNewBox(image) {
         const id = currentId;
         currentId++;
+        order++;
 
-        const vacantCoords = this.findVacantPlace();
+        const {x, y} = this.findVacantPlace();
 
-        const colors = [
-          'rgba(255, 0, 0, .3)',
-          'rgba(255, 255, 0, .3)',
-          'rgba(0, 0, 255, .3)'
-        ];
         return {
           id: `el-${id}`,
-          x: vacantCoords,
-          y: vacantCoords,
+          x,
+          y,
           scaleX: 1,
           scaleY: 1,
-          width: 100,
-          height: 100,
+          width: 250,
+          height: 250,
           angle: 0,
           classPrefix: "tr",
           assetImage: image,
-          styles: {
-            backgroundColor: `${colors[id % 3]}`,
-          },
-
+          order,
           isSelected: true,
+          underDrag: false,
           inCanvas: true,
+          willBeRemoved: false,
         }
       },
+
       selectElement(id) {
         this.elements = this.elements.map(item => {
+          const match = item.id === id;
+
           return {
             ...item,
-            isSelected: item.id === id,
+            isSelected: match,
+            underDrag: match,
+            order: item.id === id ? order++ : item.order,
           }
         });
       },
 
       onMouseUp(id) {
-        // const elementsCopy = [...this.elements];
-        // _remove(elementsCopy, (el) => el.id === id && !el.inCanvas);
-        // console.warn('ты хочешь его удалить?', id)
-        // this.elements = elementsCopy;
+        if (this.checkTrashIntersection()) {
+          this.removeItem(id);
+          return true;
+        }
+        this.elements = this.elements.map(item => ({
+          ...item,
+          underDrag: false,
+        }));
+      },
+
+      checkTrashIntersection() {
+        const tbRect = this.$refs.trashBin.getBoundingClientRect();
+        const trash = {
+          x: tbRect.left + getScroll.left(),
+          y: tbRect.top + getScroll.top(),
+          width: tbRect.width,
+          height: tbRect.height
+        };
+        const mouse = {
+          width: 1,
+          height: 1,
+          ...this.mouse
+        };
+
+        console.log(tbRect.top, getScroll.top());
+
+        return isIntersectedForNonSmokers(trash, mouse);
       },
 
       findVacantPlace(step = 15) {
-        if(!this.elements) {
-          return 0;
+        if (!this.elements) {
+          return 1;
         }
-        let counter = 0;
+        let counter = 1;
         const sorted = this.elements.sort((el1, el2) => el1.x < el2.x ? -1 : 1);
-        console.info(sorted);
+
         sorted.forEach((el) => {
           if (el.x === counter * step) {
             counter++;
           }
         });
 
-        return counter * step;
+        return {
+          x: counter * step,
+          y: counter * step + 45
+        };
       },
 
       selectCategory(key) {
@@ -206,16 +368,44 @@
           }
         });
       },
+
       selectAsset(asset) {
         this.elements = _map(this.elements, (el) => ({
           ...el,
           isSelected: false,
         }));
-        this.elements.push(this.getNewBox(asset.image))
+        this.elements.push(this.getNewBox(asset.image));
       },
 
       addPhotoToCanvas(base64) {
         this.photoSrc = base64;
+      },
+
+      onFinishEdit() {
+        if (this.editFinished) {
+          this.$emit('onEditFinish');
+        } else {
+          this.editFinished = true;
+        }
+      },
+
+      fillCategories(rawCategories, assets) {
+        const clone = {...rawCategories};
+        _each(clone, (cat, key) => {
+          cat.assets = assets[key] || [];
+        });
+
+        return clone;
+      },
+
+      removeItem(id) {
+        const cloneElements = [...this.elements];
+        _remove(cloneElements, (el) => el.id === id);
+        this.elements = cloneElements;
+      },
+
+      onImagesReady(imgs) {
+        this.$emit('onEditFinish', imgs);
       }
     }
   }

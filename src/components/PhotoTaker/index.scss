@@ -1,27 +1,57 @@
 @import '../../global/style/utils';
+@import '../../global/style/btnUtils';
 
 .photoTaker {
   width: 460px;
   height: 590px;
-  outline: 3px darkorange solid;
+}
+
+.activated {
+  background-color: $generalBg;
+}
+
+.loader {
+  @include stretch();
+  opacity: 0;
+
+  &.loader_active {
+    opacity: 1;
+  }
 }
 
 .buttonsBlock {
   position: absolute;
-  bottom: 0;
+  bottom: $buttonsBottom;
   left: 0;
   right: 0;
-  height: 50px;
+  height: 45px;
   z-index: z-index('photoTakerButtons');
+  display: flex;
+  justify-content: center;
+}
+
+.buttonsBlock__inactive {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .inputFileLabel {
+  @include button();
+  @include buttonTransparent();
+
+  left: auto;
+  right: auto;
+  bottom: auto;
+  display: block;
   position: relative;
-  background: cyan;
-  padding: 5px;
+  line-height: 41px;
+  width: 200px;
+  text-align: center;
   cursor: pointer;
   overflow: hidden;
   z-index: 1;
+  margin-right: 20px;
+  user-select: none;
 }
 
 .inputFile {
@@ -44,7 +74,19 @@
 }
 
 .chooseWebcamBtn {
+  @include button(none, true);
+  @include buttonTransparent();
+
+  left: auto;
+  right: auto;
+  bottom: auto;
   position: relative;
+  width: 45px;
   cursor: pointer;
   z-index: 2;
 }
+
+.chooseWebcamBtn__icon {
+  @include resetBtn();
+}
+

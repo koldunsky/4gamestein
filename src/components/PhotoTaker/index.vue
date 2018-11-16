@@ -1,23 +1,41 @@
 <template>
-  <div class="photoTaker">
-    <div class="buttonsBlock">
+  <div
+      class="photoTaker"
+      :class="{
+        'activated': type === 'webcam' && !uncutImage
+      }"
+  >
+    <PhotoLoader
+        class="loader"
+        :class="{
+        'loader_active': type === 'webcam' && !uncutImage
+      }"
+    />
+    <div
+        class="buttonsBlock"
+        :class="{
+          'buttonsBlock__inactive': type === 'webcam' || uncutImage
+        }"
+    >
       <label
           class="inputFileLabel"
           @click="chooseUpload"
       >
-        Загрузить фото
+          Загрузить фото
+
         <input
             class="inputFile"
             ref="inputFile"
             @change="updatePhotoFromInput"
             type="file"
+            accept=".jpeg, .jpg, .gif, .png, image/*"
         >
       </label>
       <button
           class="chooseWebcamBtn"
           @click="chooseWebcam"
       >
-        Shoot
+        <WebcamIcon class="chooseWebcamBtn__icon"/>
       </button>
     </div>
 
@@ -34,6 +52,7 @@
     >
       <Webcam
           @updateImage="updateUncutImage"
+          @onReset="onReset"
       />
     </div>
     <Croppie
@@ -41,18 +60,23 @@
         v-if="uncutImage"
         :src="uncutImage"
         @onCropImage="saveImageToCanvas"
+        @onReset="onReset"
     />
   </div>
 </template>
 
 <script>
-  import Webcam from './webcam';
-  import Croppie from './croppie';
+  import Webcam from './Webcam';
+  import Croppie from './Croppie';
+  import WebcamIcon from './assets/webcam.svg';
+  import PhotoLoader from './assets/loader.svg';
 
   export default {
     components: {
       Webcam,
-      Croppie
+      Croppie,
+      WebcamIcon,
+      PhotoLoader
     },
     props: {},
 
@@ -60,7 +84,6 @@
       return {
         uncutImage: null,
         image: null,
-        croppieInstance: null,
         type: null, // 'upload' || 'webcam'
       }
     },
@@ -69,11 +92,21 @@
 
     },
     methods: {
+      onReset() {
+        this.type = null;
+        this.image = null;
+        this.uncutImage = null;
+        this.$emit('onReset');
+      },
+
       chooseUpload: function () {
+        this.$refs.inputFile.value = null;
         this.type = 'upload';
+        this.$emit('onTypeChoose', this.type);
       },
       chooseWebcam: function () {
         this.type = 'webcam';
+        this.$emit('onTypeChoose', this.type);
       },
       updatePhotoFromInput() {
         const {

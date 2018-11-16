@@ -1,9 +1,26 @@
 @import '../../global/style/utils.scss';
 
+.editorStage {
+  z-index: z-index(editor);
+
+  position: relative;
+  width: 100%;
+  background-image: url('./assets/bg.png');
+  background-position: center;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 250px;
+  overflow: hidden;
+}
+
 .editor {
   position: relative;
   width: 750px;
-  background: slategrey;
+  margin: auto;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .editor__left-panel {
@@ -11,7 +28,7 @@
 
   right: auto;
   width: 110px;
-  height: 460px;
+  height: 535px;
   z-index: z-index('editorPanel');
 }
 
@@ -26,15 +43,15 @@
 }
 
 .editor__photo-taker {
-  position: absolute;
-  top: 550px;
+  @include stretch();
+
+  top: 20px;
+  bottom: auto;
   z-index: z-index('photoTaker');
 }
 
 .photoBg {
   @include stretch;
-
-  top: 20px;
   bottom: auto;
   width: $editor-w;
   height: $editor-h;
@@ -63,25 +80,149 @@
   top: 10px;
   bottom: auto;
   pointer-events: none;
+  z-index: z-index('borderDecoration');
 }
 
 .svgBg {
   @include stretch();
-  width: 60%;
+  width: 410px;
+  * {
+    fill: rgba(#1c2827, .7);
+  }
 }
 
 .workspace {
+  position: relative;
   margin: 0 auto;
   background-color: #050708;
   background-position: center;
   background-size: 90%;
   background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: z-index(editorWorkspace);
 }
 
 .resultCanvas {
-  position: fixed;
-  bottom: -170px;
+  top: 20px;
+  @include stretch();
+  height: $editor-h;
+  width: $editor-w;
+  z-index: z-index(canvas);
+}
+
+.finishButtonBlock {
+  @include stretch();
+  top: 100%;
+  bottom: auto;
+  margin: auto;
+  display: block;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.editorDescription {
+  padding-top: 50px;
+  width: 790px;
+  text-align: center;
+  margin: auto;
+}
+
+.editorDescription__icon {
+  margin: auto;
+  height: 55px;
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+.pumpkinIcon {
+  fill: $mediumGreen;
+}
+
+.editorDescription__title {
+  text-transform: uppercase;
+  color: $fontColorWhite;
+  font-size: 26px;
+  font-weight: bold;
+  padding-bottom: 20px;
+}
+
+.editorDescription__text {
+  font-size: 18px;
+  padding-bottom: 30px;
+  line-height: 1.6;
+}
+
+.trashBin {
+  @include stretch();
+  @include transition(top, opacity);
+
+  transition-duration:.5s;
+  transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  opacity: 0;
+  pointer-events: none;
+  top: $editor-h - 35px;
+  bottom: auto;
+  background-color: $white;
+  border-radius: 50px;
+  width: 45px;
+  height: 45px;
+  z-index: z-index(transhBin);
+  box-shadow: 0 1px 4px rgba($black, .3);
+
+  &.trashBin_shown {
+    top: $editor-h - 50px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  &.trashBin_active {
+    opacity: 1;
+    background: $red;
+  }
+}
+
+.trashBin__icon {
+  @include stretch();
+
+  width: 30px;
+  height: 30px;
+}
+
+@keyframes floating {
+  0% {
+    margin-top: 0;
+  }
+
+  65% {
+    margin-top: 5px;
+  }
+}
+
+.mnstr {
+  background-image: url('../../assets/mnstr.png');
+  position: absolute;
   left: 50%;
-  transform: scale(.4);
-  z-index: 99999;
+  margin-left: 365px;
+  top: 475px;
+  height: 160px;
+  width: 200px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center bottom;
+  animation: floating 3s infinite;
+  z-index: z-index(mnstr);
+  pointer-events: none;
+}
+
+.editor__examples {
+  position: relative;
+  z-index: z-index(editorExamples);
+  padding-bottom: 40px;
+}
+
+.ctaText {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 120px);
+  text-align: center;
 }

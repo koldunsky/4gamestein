@@ -1,0 +1,51 @@
+@import '../../../global/style/utils.scss';
+@import './sliderStyling';
+@import '../../../global/style/btnUtils';
+
+.croppieContainer {
+  width: 460px;
+  height: 590px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.cr-viewport {
+  border: 1px dashed rgba(black, .5) !important;
+}
+
+.cr-slider-wrap {
+  @include button(center);
+
+  z-index: 2;
+  padding: 10px 20px;
+  background-color: $white;
+  border-radius: 50px;
+  height: 45px;
+  &:hover {
+    background: $white;
+    border-color: $white;
+  }
+}
+
+.cr-slider {
+  margin: 0;
+  padding: 0;
+  @include stretch();
+}
+
+.saveCroppedBtn {
+  @include button(right, true);
+  background: $yellow;
+  border-color: $yellow;
+  z-index: 3;
+
+  &:hover {
+    background: $green;
+    border-color: $green;
+  }
+}
+
+.saveCroppedBtn__icon {
+  @include resetBtn();
+}

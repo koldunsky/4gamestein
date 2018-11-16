@@ -1,0 +1,67 @@
+$buttonsBottom: 20px;
+$buttonsLeft: 25px;
+$buttonsRight: 25px;
+
+@mixin button($arrange: left, $round: false) {
+  @include transition(color, background-color, border-color);
+
+  position: absolute;
+  bottom: $buttonsBottom;
+  background-color: $white;
+  border-radius: 45px;
+  border: 2px solid $white;
+  height: 45px;
+  color: $black;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+  box-shadow: 0 1px 4px rgba($black, .3);
+
+  @if $arrange == left {
+    left: $buttonsLeft;
+    right: auto;
+  } @else if $arrange == right {
+    left: auto;
+    right: $buttonsRight;
+  } @else if $arrange == center {
+    left: 0;
+    right: 0;
+    width: 292px !important;
+    margin: 0 auto !important;
+  }
+
+  @if $round == true {
+    width: 45px;
+  }
+
+  svg {
+    @include transition(fill);
+
+    fill: $black;
+  }
+
+  &:hover {
+    background-color: $yellowHover;
+    border-color: $yellowHover;
+    color: $black;
+
+    svg {
+      fill: $black;
+    }
+  }
+}
+
+@mixin buttonTransparent() {
+  background: transparent;
+  color: $white;
+
+  svg {
+    fill: $white;
+  }
+}
+
+@mixin resetBtn() {
+  width: 17px;
+  height: 17px;
+  vertical-align: middle;
+}

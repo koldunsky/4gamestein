@@ -1,0 +1,117 @@
+@import '../../global/style/utils.scss';
+
+.promoBlock {
+  background: $generalBg;
+  position: relative;
+  width: 100%;
+  //width: 780px;
+  text-align: center;
+  margin: auto;
+  z-index: z-index(promoBlock);
+}
+
+.promoBlock__icon {
+  margin: auto;
+  height: 55px;
+  width: 200px;
+  margin-bottom: 20px;
+}
+.pumpkinIcon {
+  fill: $mediumGreen;
+}
+
+.promoBlock__subtitle {
+  font-size: 19px;
+  margin-bottom: 35px;
+}
+
+.promoBlock__title {
+  font-size: 44px;
+  margin-bottom: 45px;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  color: $fontColorWhite;
+}
+
+.promoBlock__button {
+  font-size: 18px;
+  text-transform: none;
+  height: 60px;
+  line-height: 60px;
+}
+
+.promoBlock__prizes {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 920px;
+  margin: 0 auto;
+  padding-top: 15px;
+  padding-bottom: 80px;
+}
+
+.promoBlock__prize {
+  width: 25%;
+}
+
+.prize {
+  position: relative;
+  width: 195px;
+  top: 75px;
+
+  &_big {
+    top: 0;
+    width: 243px;
+  }
+}
+
+.prize__label {
+  color: $white;
+  padding-top: 20px;
+}
+
+.prize__imageBlock {
+  position: relative;
+  color: $white;
+  width: 160px;
+  height: 195px;
+  margin: 0 auto;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffbb0d+0,ffbb0d+100&0.5+0,0+80 */
+  background: -moz-radial-gradient(center, ellipse cover, rgba(255,187,13,0.5) 0%, rgba(255,187,13,0) 80%, rgba(255,187,13,0) 100%); /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(255,187,13,0.5) 0%,rgba(255,187,13,0) 80%,rgba(255,187,13,0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, rgba(255,187,13,0.5) 0%,rgba(255,187,13,0) 80%,rgba(255,187,13,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffbb0d', endColorstr='#00ffbb0d',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+
+  background-size: 160px 195px;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+
+  &_big {
+    width: 180px;
+    height: 285px;
+    background-size: 180px 220px;
+  }
+}
+
+.prize__image {
+  @include stretch();
+
+  background-position: center;
+  background-repeat: no-repeat;
+  -webkit-background-size: contain;
+  background-size: contain;
+}
+
+.prize__imageFrame {
+  @include stretch();
+
+  width: 160px;
+  height: 195px;
+  top: auto;
+  fill:  mix(#F5B105, $black, 30%);
+  &_big {
+    width: 180px;
+    height: 220px;
+  }
+}

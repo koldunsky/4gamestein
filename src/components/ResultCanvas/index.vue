@@ -1,6 +1,5 @@
 <template>
   <div class="resultCanvas">
-    <h1>PRVIEW</h1>
     <canvas
         class="canvas"
         ref="canvas"
@@ -8,9 +7,13 @@
         :height="height"
     >
     </canvas>
-    <div style="opacity: 0; height: 0; width: 0;">
-      {{assets}}
-    </div>
+    <canvas
+        class="socialCanvas"
+        ref="socialCanvas"
+        :width="social.width"
+        :height="social.height"
+    >
+    </canvas>
   </div>
 </template>
 
@@ -20,12 +23,18 @@
       'width',
       'height',
       'assets',
-      'background',
+      'photo',
+      'getResultImages'
     ],
 
     data() {
       return {
         ctx: null,
+        social: {
+          bg: require('./assets/bg_1409x630.png'),
+          width: 1409,
+          height: 630,
+        }
       }
     },
 
@@ -37,20 +46,24 @@
       this.ctx = this.$refs.canvas.getContext("2d");
       this.redraw();
     },
+
     methods: {
       drawAsset(a) {
-        const normalizedAsset = this.normalizeSize(a);
-        const {width, height, x, y, angle, assetImage} = normalizedAsset;
-        const image = new Image(width, height);
+        return new Promise((resolve) => {
+          const normalizedAsset = this.normalizeSize(a);
+          const {width, height, x, y, angle, assetImage} = normalizedAsset;
+          const image = new Image(width, height);
 
-        image.onload = () => {
-          if (angle !== 0) {
-            this.drawRotated(image, x, y, width, height, angle)
-          } else {
-            this.ctx.drawImage(image, x, y, width, height);
-          }
-        };
-        image.src = assetImage;
+          image.onload = () => {
+            if (angle !== 0) {
+              this.drawRotated(image, x, y, width, height, angle)
+            } else {
+              this.ctx.drawImage(image, x, y, width, height);
+            }
+            resolve(image);
+          };
+          image.src = assetImage;
+        });
       },
 
       drawRotated(image, x, y, w, h, degrees) {
@@ -73,6 +86,18 @@
 
         // we’re done with the rotating so restore the unrotated context
         ctx.restore();
+      },
+
+      drawImage(ctx, src, x, y, width, h) {
+        return new Promise((resolve) => {
+          const image = new Image(width, h);
+
+          image.onload = () => {
+            ctx.drawImage(image, x, y, width, h);
+            resolve(image);
+          };
+          image.src = src;
+        });
       },
 
       normalizeSize(asset) {
@@ -115,25 +140,59 @@
           ctx,
           width,
           height,
-          background,
+          photo,
           assets
         } = this;
+
+        const promises = [];
 
         // Clear
         ctx.clearRect(0, 0, parseInt(width, 10), parseInt(height, 10));
 
         // Photo
-        if (background) {
-          const image = new Image(width, height);
+        if (photo) {
+          promises.push(
+            new Promise((resolve) => {
+              const image = new Image(width, height);
 
-          image.onload = () => {
-            this.ctx.drawImage(image, 0, 0, width, height);
-          };
-          image.src = background;
+              image.onload = () => {
+                this.ctx.drawImage(image, 0, 0, width, height);
+                resolve(image);
+              };
+              image.src = photo;
+            })
+          );
         }
 
         // Assets
-        assets.forEach(this.drawAsset);
+        assets.sort((a, b) => {
+          return a.order < b.order ? -1 : 1;
+        });
+        assets.forEach((asset) => {
+          promises.push(this.drawAsset(asset));
+        });
+
+        Promise.all(promises)
+          .then(this.drawSocialCanvas)
+          .then(() => {
+            this.$emit('onImagesReady', {
+              raw: this.$refs.canvas.toDataURL(),
+              framed: this.$refs.socialCanvas.toDataURL(),
+            });
+          });
+      },
+
+      drawSocialCanvas() {
+        return new Promise((resolve) => {
+          const ctx = this.$refs.socialCanvas.getContext("2d");
+          const {bg, width, height} = this.social;
+
+          this.drawImage(ctx, bg, 0, 0, width, height)
+            .then(() => {
+              ctx.drawImage(this.$refs.canvas, 520, 145, 365, 470);
+              resolve();
+            });
+        });
       }
     }
   };

@@ -1,17 +1,39 @@
 $editor-w: 460px;
 $editor-h: 590px;
 
-$generalBg: #0b1114;
-$generalBg: grey;
+$black: #000;
+$generalBg: #01090c;
+//$generalBg: grey;
+$panelBg: #0c1011;
+$white: #fff;
+$yellow: #f5b105;
+$yellowHover: #fac706;
+$red: #BC3B3B;
+$green: #72BC3B;
+$fontColorBlue: #6a97a3;
+$fontColorWhite: #fff;
+$mediumGreen: #42616e;
 
-$z-list: 'editor',
+$bp_desktop: 'screen and (min-width: 1200px)';
+
+$z-list: 'azaza',
+'header',
+'editor',
+'promoBlock',
+'legalInfo',
+'editorPanel',
+'editorWorkspace',
 'photoTaker',
 'photoTakerButtons',
 'photoTakerWebcam',
 'photoTakerWebcamScreenshotButton',
 'photoTakerCroppie',
-'editorPanel',
-'eritorAsset';
+'editorExamples',
+'canvas',
+'borderDecoration',
+'transhBin',
+'mnstr',
+'ontop';
 
 @function z-index($key) {
   @return index($z-list, $key);
@@ -25,3 +47,94 @@ $z-list: 'editor',
   right: 0;
   margin: auto;
 }
+
+@mixin transition($prop...) {
+  @if($prop) {
+    transition-property: $prop;
+    will-change: $prop;
+  } @else {
+    transition-property: all;
+  }
+  transition-timing-function: ease;
+  transition-duration: .3s;
+}
+
+@mixin panel() {
+  background-color: $panelBg;
+  border-radius: 5px;
+}
+
+@mixin inactivePanel() {
+  opacity: .2;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0% {
+    left: -15%;
+  }
+  100% {
+    left: 115%;
+  }
+}
+
+@keyframes blinkLong {
+  0% {
+    left: -15%;
+  }
+
+  10% {
+    left: 115%;
+  }
+
+  98% {
+    left: 115%;
+    opacity: 1;
+  }
+
+  99% {
+    left: 115%;
+    opacity: 0;
+  }
+
+  100% {
+    left: -15%;
+    opacity: 0;
+  }
+}
+
+@mixin blink {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 200%;
+    left: -15%;
+    top: -50%;
+    transform: rotateZ(20deg);
+    background: $white;
+    opacity: .5;
+    pointer-events: none;
+  }
+}
+
+@mixin blinkActiveLong($duration: 7s, $delay: 0, $repeat: infinite) {
+  &::after {
+    animation: blinkLong $duration $repeat;
+    animation-delay: $delay;
+    animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  }
+}
+
+@mixin blinkActive($duration: .7s, $delay: .2s, $repeat: 1) {
+  &::after {
+    animation: blink $duration $repeat;
+    animation-delay: $delay;
+    animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  }
+}
+
+@import 'btnUtils';

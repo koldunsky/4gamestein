@@ -1,0 +1,99 @@
+@import "../../global/style/utils";
+
+@mixin layer($src, $size: cover, $position: top center) {
+  background-image: url($src);
+  background-size: $size;
+  background-position: $position;
+  background-repeat: no-repeat;
+}
+
+.header {
+  position: relative;
+  background-color: $generalBg;
+  min-width: 1100px;
+  min-height: 650px;
+  z-index: z-index('header');
+}
+
+.header::after {
+  content: '';
+  display: block;
+  padding-top: 50%;
+}
+
+.parallax {
+  @include stretch();
+  will-change: transform;
+}
+
+.parallax_uno {
+  @include layer('./assets/1.jpg');
+}
+
+.parallax_dos {
+  @include layer('./assets/2.png', auto 50%, bottom center);
+  bottom: 12%;
+}
+
+.parallax_tre {
+  @include layer('./assets/3.png', 100% auto, bottom center);
+}
+
+.parallax_tre::after {
+  position: absolute;
+  top: 98%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: '';
+  position: absolute;
+  background: $generalBg;
+}
+
+.slogan {
+  @include stretch;
+
+  top: 30%;
+  width: 500px;
+  color: #fff;
+  text-align: center;
+}
+
+.sloganImage {
+  background-image: url('./assets/sloganGlow.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  padding-top: 35px;
+  padding-left: 35px;
+  padding-bottom: 40px;
+  padding-right: 35px;
+
+}
+
+.sloganImage__icon {
+  width: 430px;
+  height: 230px;
+}
+
+.sloganImage__icon * {
+  fill: $white;
+}
+
+.sloganSub {
+  font-size: 17px;
+  margin-bottom: 30px;
+}
+.sloganRibbonText {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding-top: 46%;
+  padding-left: 15px;
+  color: #4296ab;
+  font-size: 11px;
+  @media #{$bp_desktop} {
+    font-size: 12px;
+  }
+}

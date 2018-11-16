@@ -7,10 +7,6 @@
   export default {
     props: {
     },
-
-    mounted() {
-      console.info('111');
-    }
   };
 </script>
 

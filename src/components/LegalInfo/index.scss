@@ -1,0 +1,139 @@
+@import '../../global/style/utils.scss';
+
+.legalInfo {
+  width: 100%;
+  padding-bottom: 60px;
+  padding-top: 80px;
+  background: $generalBg;
+  z-index: z-index(legalInfo);
+  position: relative;
+  line-height: 1.4;
+
+  ul,
+  ol {
+    padding-left: 20px;
+  }
+
+  ol { counter-reset: item }
+  li { display: block }
+  li:before {
+    position: absolute;
+    top: 0;
+    right: 100%;
+  }
+
+  ol > li:before {
+    content: counters(item, ".") " ";
+    counter-increment: item
+  }
+  ul > li:before {
+    content: '';
+    position: absolute;
+    background: $fontColorBlue;
+    border-radius: 5px;
+    width: 7px;
+    height: 7px;
+    top: 6px;
+  }
+
+  li {
+    padding-bottom: 20px;
+    padding-left: 10px;
+    position: relative;
+  }
+
+  li > ol,
+  li > ul {
+    padding-top: 10px;
+  }
+
+  a {
+    color: $yellow;
+    &:hover {
+      color: $yellowHover;
+    }
+  }
+}
+
+.legalInfo__triggerIcon {
+  @include transition(transform);
+
+  fill: $white;
+  width: 25px;
+  height: 14px;
+  display: block;
+  margin: auto;
+  margin-bottom: 10px;
+  transform: rotateZ(180deg);
+
+  &_opened {
+    transform: rotateZ(0);
+  }
+}
+
+.legalInfo__trigger {
+  @include transition(opacity);
+
+  display: block;
+  margin: 0 auto;
+  width: 200px;
+  text-align: center;
+  background: none;
+  border: none;
+  color: $white;
+  padding-top: 30px;
+  font-size: 17px;
+  opacity: .5;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.legalInfo__content {
+  @include transition(height);
+
+  width: 720px;
+  margin: 0 auto;
+  height: 0;
+  overflow: hidden;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.legalInfo__contentInner {
+  padding-top: 30px;
+}
+
+.section {
+  padding-bottom: 130px;
+}
+
+.h2 {
+  font-size: 30px;
+  padding-bottom: 35px;
+  text-align: center;
+  color: $white;
+}
+
+.h3 {
+  color: $white;
+  display: inline-block;
+  padding-bottom: 15px;
+}
+.h4 {
+  color: $white;
+  padding-top: 20px;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+.specialList {
+  & > li {
+    color: $fontColorWhite;
+    & > ol {
+      color: $fontColorBlue;
+    }
+  }
+}

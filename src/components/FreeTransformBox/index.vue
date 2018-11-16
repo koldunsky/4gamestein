@@ -15,25 +15,27 @@
       selectOn="mousedown"
       @update="update(element.id, $event)"
       @mousedown="onMouseDown(element.id)"
-      @mouseup="$emit('mouseup', element.id)"
+      @mouseup="onMouseUp"
+      :style="{'z-index': element.order}"
   >
     <div class="tr-content-image"
          :class="{
           'tr-content-image_inside-canvas': element.inCanvas,
+          'tr-content-image_under-drag': element.underDrag,
+          'tr-content-image_will-be-removed': element.willBeRemoved,
          }"
          :style="{
             width: '100%',
             height: '100%',
             backgroundImage: `url(${element.assetImage})`,
          }">
-      insideCanvas: {{element.inCanvas}}
     </div>
-
   </FreeTransform>
 </template>
 
 <script>
   import FreeTransform from 'vue-free-transform'
+  import RotateIcon from './assets/rotate.svg';
 
   export default {
     props: [
@@ -45,12 +47,17 @@
       'selectElement'
     ],
     components: {
-      FreeTransform
+      FreeTransform,
+      RotateIcon
     },
+
     methods: {
-      onMouseDown: function (id) {
+      onMouseDown(id) {
         this.selectElement(id);
       },
+      onMouseUp(e) {
+        this.$emit('mouseup', this.element.id);
+      }
     }
   }
 </script>

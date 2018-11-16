@@ -1,0 +1,137 @@
+@import '../../global/style/utils.scss';
+
+
+.rightPanel {
+  @include panel;
+
+  padding: 45px 0;
+}
+
+.inactive {
+  @include inactivePanel;
+}
+
+.scrollContainer {
+  overflow: hidden;
+  position: relative;
+
+  &::after,
+  &::before {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 30px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, $panelBg, rgba($panelBg, 0) 90%);
+    z-index: 15;
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(to top, $panelBg, rgba($panelBg, 0) 90%);
+  }
+}
+
+.assetsContainer {
+  overflow-y: scroll;
+  margin-right: -20px;
+  padding-right: 20px;
+  text-align: center;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.innerScrollContainer {
+  overflow: hidden;
+}
+
+.asset {
+  width: 80px;
+  height: 80px;
+  margin: 25px auto;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#224243+0,224243+70&0.8+0,0+70 */
+  background: -moz-radial-gradient(center, ellipse cover, rgba(34,66,67,1) 0%, rgba(34,66,67,0) 70%); /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(34,66,67,1) 0%,rgba(34,66,67,0) 70%); /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, rgba(34,66,67,1) 0%,rgba(34,66,67,0) 70%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc224243', endColorstr='#00224243',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+
+  //&:nth-child(4n+3) {
+  //  background: saddlebrown;
+  //}
+  //&:nth-child(4n+4) {
+  //  background: green;
+  //}
+}
+
+.assetPreview {
+  @include transition(transform);
+
+  .asset:hover & {
+    transform: scale(1.1);
+  }
+}
+
+.arrow {
+  @include transition(transform, top, bottom, opacity);
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  cursor: pointer;
+  height: 45px;
+  background: none;
+  border: none;
+  color: #fff;
+  outline: none;
+  font-size: 30px;
+  user-select: none;
+
+  &:active {
+    transform: scale(.95);
+  }
+}
+
+.hidden {
+  opacity: 0;
+}
+
+.arrow_up {
+  top: 0;
+  &:hover {
+    top: -2px;
+  }
+}
+
+.arrow_down {
+  bottom: 0;
+  &:hover {
+    bottom: -2px;
+  }
+}
+
+.arrow__icon {
+  fill: $white;
+  width: 30px;
+}
+
+.arrow__icon_down {
+  fill: $white;
+  transform: rotateZ(.5turn);
+}
+
+.scrollContainer {
+  height: 100%;
+}
+

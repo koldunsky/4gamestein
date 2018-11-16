@@ -1,0 +1,57 @@
+@import '../../global/style/utils.scss';
+
+.leftPanel {
+  @include panel;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding-top: 25px;
+}
+
+.inactive {
+  @include inactivePanel;
+}
+
+.category {
+  width: 70px;
+  margin: 0 auto 15px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+
+.categoryIcon {
+  @include transition(filter);
+  width: 70px;
+  height: 70px;
+
+  .category:hover & {
+    filter: brightness(1.5);
+  }
+
+  .isActive.isActive & {
+    filter: brightness(5);
+  }
+}
+
+.categoryTitle {
+  @include transition(color);
+
+  color: transparent;
+  font-size: 10px;
+  text-align: center;
+  .category:hover & {
+    color: lighten(#80A8CC, .5);
+  }
+
+  .isActive.isActive & {
+    color: white;
+  }
+}
